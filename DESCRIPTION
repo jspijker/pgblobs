@@ -1,0 +1,10 @@
+Package: pgblobs
+Type: Package
+Title: blob objects for pgobjects
+Version: 0.0.1
+Date: 2016-02-25
+Author: Vectrun
+Maintainer: Vectrun <vectrun@gmail.com>
+Description: Package for blob functions in pgobjects
+License: GPL-3
+LazyLoad: yes

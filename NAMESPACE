@@ -1,0 +1,12 @@
+export(createBlob)
+export(deleteBlob)
+export(getBlob)
+export(loadBlob)
+export(getmd5)
+export(checkmd5)
+export(read.ini)
+export(write.ini)
+export(storeIniObj)
+export(getMetaObjName)
+export(getMetaObj)
+

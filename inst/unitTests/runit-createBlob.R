@@ -1,0 +1,135 @@
+library(RPostgreSQL)
+library(pgobjects)
+library(localoptions)
+readOptions("~/.R.options")
+
+test.createBlobExceptions <- function() {
+
+	# test input
+	source("../inst/unitTests/sysSetup.R")
+
+	options("pgobj.blobs"=NULL)
+	checkException(createBlob(kv=list(key1="val1"),file=testdat,
+							  name=blobname, textfile=testtxt))
+
+	checkException(createBlob(kv=list(key1="val1"),file=testdat,
+							  name=blobname, textfile=testtxt,blobpath=1))
+
+	options("pgobj.blobs"=blobpath)
+
+	
+	# options obj and file mutually exclusive
+	checkException(createBlob(obj=1,file=testdat,name=blobname,path=blobpath))
+	checkException(createBlob(fname=1,name=blobname,path=blobpath))
+	checkException(createBlob(fname=testdat)) # forget name
+	checkException(createBlob(fname=testdat,name=blobname,
+							  kv=1))
+	checkException(createBlob(fname=testdat,name=blobname,
+							  description=1))
+	checkException(createBlob(fname=testdat,name=blobname,
+							  textfile=1))
+
+	checkException(createBlob(fname=testdat,name=blobname,
+							  textfile="nonExistetFileName.txt"))
+	checkException(createBlob(fname="nonExistentFileName.dat",name=blobname,
+							  textfile=testtxt))
+
+	checkException(createBlob(kv=list("nonsens"),fname=testdat,
+							  name=blobname,
+							  textfile=testtxt))
+
+	checkException(createBlob(kv=list(key1="val1",emptykey=""),fname=testdat,
+							  name=blobname,
+							  textfile=testtxt))
+
+	checkException(createBlob(kv=list(key1="val1",emptykey=""),fname=testdat,
+							  name=blobname,
+							  textfile=testtxt))
+
+}
+test.createBlob <- function() {
+
+	
+	source("../inst/unitTests/sysSetup.R")
+
+	PgObjectsInit(dbname=getOption("pgobj.dbname"),
+				  passwd=getOption("pgobj.password"))
+
+	if(!tableExists("robjects")){
+		createPgobjTables()
+	}
+
+	# create blob, add some complexity
+	x1 <- data.frame(x=rnorm(100),y=rnorm(100),z=rnorm(100))
+	x2 <- data.frame(x=rnorm(100),y=rnorm(100),z=rnorm(100))
+	blob.in <- list(x1=x1,x2=x2,x3=c(rnorm(100)))
+
+
+	# test errors in case file cannot be written
+	checkException(createBlob(obj=blob.in,name=blobname,
+							  textfile=testtxt,
+							  kv=kvlist,
+							  description="a test blobl",
+							  blobpath="/"))
+
+	file.create(paste(blobpath,"/",blobname,".rds",sep=""))
+
+	checkException(createBlob(obj=blob.in,name=blobname,
+							 textfile=testtxt,
+							 kv=kvlist,
+							 description="a test blobl"))
+
+	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
+
+
+	# check blob from object, no textfile
+	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
+	file.remove(paste(blobpath,(testfname),sep="/"))
+
+	blob.obj <- createBlob(obj=blob.in,name=blobname,
+						  kv=kvlist,
+						  description="a test blobl")
+	checkTrue(objectExists(blobname))
+
+
+	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
+	file.remove(paste(blobpath,(testfname),sep="/"))
+
+	# check blob from object
+	blob.obj <- createBlob(obj=blob.in,name=blobname,
+						  textfile=testtxt,
+						  kv=kvlist,
+						  description="a test blobl")
+
+	checkTrue(objectExists(blobname))
+	v1<-getKeyval(blobname,"key1")
+	checkIdentical(v1,"value1")
+
+	connection <- file(testtxt)
+	txtcontent<- readLines(connection)
+	close(connection)
+	checkIdentical(blob.obj$text,txtcontent)
+
+	# check blob from file
+	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
+	file.remove(paste(blobpath,(testfname),sep="/"))
+
+	blob.obj <- createBlob(fname=testdat,name=blobname,
+						  textfile=testtxt,
+						  kv=kvlist,
+						  description="a test blobl")
+
+
+	checkTrue(objectExists(blobname))
+	v1<-getKeyval(blobname,"key1")
+	checkIdentical(v1,"value1")
+	checkTrue(file.exists(paste(blobpath,testfname,sep="/")))
+
+	# check md5sums
+	obj.stored <- getBlob(blob=blobname,path=testtmp)
+	md5 <- obj.stored$md5
+	print(md5)
+	checkIdentical(as.character(md5),testdat.md5)
+	
+	PgObjectsClose()
+}
