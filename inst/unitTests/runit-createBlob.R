@@ -65,35 +65,15 @@ test.createBlob <- function() {
 	blob.in <- list(x1=x1,x2=x2,x3=c(rnorm(100)))
 
 
-	# test errors in case file cannot be written
-	checkException(createBlob(obj=blob.in,name=blobname,
-							  textfile=testtxt,
-							  kv=kvlist,
-							  description="a test blobl",
-							  blobpath="/"))
-
-	file.create(paste(blobpath,"/",blobname,".rds",sep=""))
-
-	checkException(createBlob(obj=blob.in,name=blobname,
-							 textfile=testtxt,
-							 kv=kvlist,
-							 description="a test blobl"))
-
-	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
-
-
+	
 	# check blob from object, no textfile
-	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
-	file.remove(paste(blobpath,(testfname),sep="/"))
-
 	blob.obj <- createBlob(obj=blob.in,name=blobname,
 						  kv=kvlist,
 						  description="a test blobl")
 	checkTrue(objectExists(blobname))
 
 
-	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
-	file.remove(paste(blobpath,(testfname),sep="/"))
+	deleteBlob(blobname)
 
 	# check blob from object
 	blob.obj <- createBlob(obj=blob.in,name=blobname,
@@ -109,11 +89,9 @@ test.createBlob <- function() {
 	txtcontent<- readLines(connection)
 	close(connection)
 	checkIdentical(blob.obj$text,txtcontent)
+	deleteBlob(blobname)
 
 	# check blob from file
-	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
-	file.remove(paste(blobpath,(testfname),sep="/"))
-
 	blob.obj <- createBlob(fname=testdat,name=blobname,
 						  textfile=testtxt,
 						  kv=kvlist,
@@ -131,5 +109,61 @@ test.createBlob <- function() {
 	print(md5)
 	checkIdentical(as.character(md5),testdat.md5)
 	
+	deleteBlob(blobname)
 	PgObjectsClose()
+}
+
+test.createBlob.file <- function(){
+	# test situation where files cannot or should not be written to
+	# disk
+
+	source("../inst/unitTests/sysSetup.R")
+
+	PgObjectsInit(dbname=getOption("pgobj.dbname"),
+				  passwd=getOption("pgobj.password"))
+
+	# create blob, add some complexity
+	x1 <- data.frame(x=rnorm(100),y=rnorm(100),z=rnorm(100))
+	x2 <- data.frame(x=rnorm(100),y=rnorm(100),z=rnorm(100))
+	blob.in <- list(x1=x1,x2=x2,x3=c(rnorm(100)))
+
+	# check blob from object
+	blob.obj <- createBlob(obj=blob.in,name=blobname,
+						   textfile=testtxt,
+						   kv=kvlist,
+						   description="a test blobl")
+
+	checkTrue(objectExists(blobname))
+
+	# try to overwrite blob
+
+	checkException(createBlob(obj=blob.in,name=blobname,
+							  textfile=testtxt,
+							  kv=kvlist,
+							  description="a test blobl"))
+
+	deleteBlob(blobname)
+
+# test errors in case file cannot be written due to permissions
+	checkException(createBlob(obj=blob.in,name=blobname,
+							  textfile=testtxt,
+							  kv=kvlist,
+							  description="a test blobl",
+							  blobpath="/"))
+
+	deleteBlob(blobname)
+
+	# try to overwrite file 
+	file.create(paste(blobpath,"/",blobname,".rds",sep=""))
+
+	checkException(createBlob(obj=blob.in,name=blobname,
+							 textfile=testtxt,
+							 kv=kvlist,
+							 description="a test blobl"))
+
+	file.remove(paste(blobpath,"/",blobname,".rds",sep=""))
+
+	deleteBlob(blobname)
+	PgObjectsClose()
+
 }

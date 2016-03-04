@@ -8,6 +8,11 @@ deleteBlob <- function(blob) {
 		stop("blob is not character")
 	}
 
+	if(!objectExists(blob)) {
+		warning(paste("object",blob,"does not exist"))
+		return()
+	}
+
 	blob.obj <- getObj(blob)
 	blob.fname <- paste(blob.obj$path,blob.obj$fname,sep="/")
 	blob.ini <- paste(blob.fname,"ini",sep=".")
