@@ -108,6 +108,8 @@ test.createBlob <- function() {
 	md5 <- obj.stored$md5
 	print(md5)
 	checkIdentical(as.character(md5),testdat.md5)
+	# remove file from testtmp
+	file.remove(paste(testtmp,testfname,sep="/"))
 	
 	deleteBlob(blobname)
 	PgObjectsClose()

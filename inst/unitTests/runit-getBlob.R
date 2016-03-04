@@ -43,9 +43,10 @@ test.getBlob <- function() {
 	checkIdentical(blob.out,blob.obj)
 
 
-	blobfile=paste(blobpath,"/",blobname,".rds",sep="")
+	blobfile=paste(testtmp,"/",blobname,".rds",sep="")
 	checkTrue(file.exists(blobfile)) 
 	checkIdentical(blob.out$fname,basename(blobfile))
+	file.remove(blobfile)
 
 	deleteBlob(blobname)
 
@@ -84,6 +85,7 @@ test.getBlobMd5 <- function() {
 	blob.in <- list(x1=x1,x2=x2,x3=c(rnorm(101)))
 	saveRDS(blob.in,filepath)
 	checkException(getBlob(blobname,path=testtmp))
+	file.remove(paste(testtmp,"/",blobname,".rds",sep=""))
 	deleteBlob(blobname)
 	PgObjectsClose()
 
