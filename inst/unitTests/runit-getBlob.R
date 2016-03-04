@@ -40,8 +40,6 @@ test.getBlob <- function() {
 	checkTrue(objectExists(blobname))
 
 	blob.out <- getBlob(blob=blobname,path=testtmp)
-	print(summary(blob.obj))
-	print(summary(blob.out))
 	checkIdentical(blob.out,blob.obj)
 
 
