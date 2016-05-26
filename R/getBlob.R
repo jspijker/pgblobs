@@ -1,11 +1,12 @@
 ######################################################################
 # getblob
 
-getBlob <- function(blob, path="./",
+getBlob <- function(blob, path="./",getini=FALSE,
 					blobpath=getOption("pgobj.blobs")) {
 	# options:
 	# blob: name of blob object
 	# path: if blob object is file, copy to path
+    # getini: if TRUE, ini file is copied too
 	# blobpath: directory where blobs are stored
 
 
@@ -21,6 +22,14 @@ getBlob <- function(blob, path="./",
 	}
 	if(!file.exists(path)) {
 		stop("path does not exist")
+	}
+
+	if(!is.character(blobpath)) {
+		stop("blobpath is not character")
+	}
+
+	if(!is.logical(getini)) {
+		stop("getini is not logical")
 	}
 
 	if(!is.character(blobpath)) {
@@ -42,6 +51,10 @@ getBlob <- function(blob, path="./",
 		stop(paste("blob",blobfile,"not found"))
 	}
 	file.copy(blobfile,path,overwrite=TRUE)
+    if(getini) {
+        inifile <- paste(blobfile,".ini",sep='')
+        file.copy(inifile,path,overwrite=TRUE)
+    }
 
 	# check md5
 	fpath <- paste(path,blob.obj$fname,sep='/')

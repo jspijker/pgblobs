@@ -8,6 +8,7 @@ test.getBlobExceptions <- function() {
 	source("../inst/unitTests/sysSetup.R")
 
 	checkException(getBlob(blob=1))
+	checkException(getBlob(blob=blobname,getini="a"))
 	checkException(getBlob(blob=blobname,path=1))
 	checkException(getBlob(blob=blobname,path="nonexistingpath"))
 	checkException(getBlob(blob=blobname,path=testpath,blobpath=1))
@@ -47,6 +48,46 @@ test.getBlob <- function() {
 	checkTrue(file.exists(blobfile)) 
 	checkIdentical(blob.out$fname,basename(blobfile))
 	file.remove(blobfile)
+
+	deleteBlob(blobname)
+
+	PgObjectsClose()
+
+}
+
+
+test.getBlobIni <- function() {
+
+	source("../inst/unitTests/sysSetup.R")
+
+	PgObjectsInit(dbname=getOption("pgobj.dbname"),
+				  passwd=getOption("pgobj.password"))
+
+	if(!tableExists("robjects")){
+		createPgobjTables()
+	}
+
+	# create blob, add some complexity
+	x1 <- data.frame(x=rnorm(100),y=rnorm(100),z=rnorm(100))
+	x2 <- data.frame(x=rnorm(100),y=rnorm(100),z=rnorm(100))
+	blob.in <- list(x1=x1,x2=x2,x3=c(rnorm(100)))
+
+	blob.obj <- createBlob(obj=blob.in,name=blobname,
+						   kv=kvlist,
+						   description="a test blob")
+	checkTrue(objectExists(blobname))
+
+	blob.out <- getBlob(blob=blobname,path=testtmp,getini=TRUE)
+	checkIdentical(blob.out,blob.obj)
+
+
+	blobfile=paste(testtmp,"/",blobname,".rds",sep="")
+	blobini=paste(testtmp,"/",blobname,".rds",".ini",sep="")
+	checkTrue(file.exists(blobfile)) 
+	checkIdentical(blob.out$fname,basename(blobfile))
+	checkTrue(file.exists(blobini)) 
+	file.remove(blobfile)
+	file.remove(blobini)
 
 	deleteBlob(blobname)
 
