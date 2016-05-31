@@ -32,6 +32,12 @@ read.ini <- function(inifile) {
 	kv <- subset(d,select=c("V3","V1","V2"),V3!="text")
 	names(kv) <- c("section","key","value")
 
+    #remove trailing spaces in key field
+    kv$key <- gsub(" $","",kv$key,perl=TRUE)
+    #remove leading  spaces in value field
+    kv$value <- gsub("^ ","",kv$value,perl=TRUE)
+
+
 	meta <- list(kv=kv,text=txt)
 
 	return(meta)

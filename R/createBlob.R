@@ -170,7 +170,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 	#	in the database and also in a human readable ini file
 
 	# first create metaobj
-	meta <- data.frame(section="meta",key="src",value=name)
+	meta <- data.frame(section="meta",key="src",value=fname)
 	meta <- rbind(meta,data.frame(section="meta",
 								  key="summary",value=description))
 	metakv <- cbind(section="object",getKeyvalObj(name))
