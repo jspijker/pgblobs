@@ -177,7 +177,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 	meta <- rbind(meta,data.frame(section="meta",
 								  key="name",value=name))
 	meta <- rbind(meta,data.frame(section="meta",
-								  key="summary",value=description))
+								  key="description",value=description))
 	metakv <- cbind(section="object",getKeyvalObj(name))
 	meta <- rbind(meta,metakv)
 	metaobj <- list(kv=meta,text=txtcontent)
