@@ -8,6 +8,8 @@ test.createBlobExceptions <- function() {
 	# test input
 	source("../inst/unitTests/sysSetup.R")
 
+	PgObjectsInit(dbname=getOption("pgobj.dbname"),
+				  passwd=getOption("pgobj.password"))
 	options("pgobj.blobs"=NULL)
 	checkException(createBlob(kv=list(key1="val1"),file=testdat,
 							  name=blobname, textfile=testtxt))
@@ -19,8 +21,8 @@ test.createBlobExceptions <- function() {
 
 	
 	# options obj and file mutually exclusive
-	checkException(createBlob(obj=1,file=testdat,name=blobname,path=blobpath))
-	checkException(createBlob(fname=1,name=blobname,path=blobpath))
+	checkException(createBlob(obj=1,file=testdat,name=blobname,blobpath=blobpath))
+	checkException(createBlob(fname=1,name=blobname,blobpath=blobpath))
 	checkException(createBlob(fname=testdat)) # forget name
 	checkException(createBlob(fname=testdat,name=blobname,
 							  kv=1))
@@ -46,7 +48,15 @@ test.createBlobExceptions <- function() {
 							  name=blobname,
 							  textfile=testtxt))
 
+	checkException(createBlob(fname=testdat,name=blobname,
+                              kv=kvlist,
+                              description=as.character(as.null())))
+
+
+	PgObjectsClose()
 }
+
+
 test.createBlob <- function() {
 
 	

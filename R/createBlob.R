@@ -63,6 +63,9 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 	if(!is.character(description)) {
 		stop("description is not character")
 	}
+	if(length(description)==0) {
+		stop("description is empty")
+    }
 
 	if(!is.na(fname)&&!is.character(fname)) {
 		stop("fname is not character")
