@@ -3,7 +3,7 @@
 # blobpath
 
 createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
-					   description="",textfile=NA, 
+					   description="",textfile=NA, md5=NA,
 					   blobpath=getOption("pgobj.blobs")) {
 
 	#################################################################
@@ -83,6 +83,10 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 		stop(paste("textfile",textfile,"does not exists"))
 	}
 
+	if(!is.na(md5)&&!is.character(md5)) {
+		stop("md5 is not character")
+	}
+
 	# check names of kv
 	kv.names <- names(kv)
 	if(is.null(kv.names)) {
@@ -150,13 +154,24 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 		txtcontent <- description
 	}
 
+	#################################################################
+	# check md5
+	md5.file <- getmd5(fpath)
+    if(is.na(md5)) {
+        # no md5 argument given
+        md5 <- md5.file
+    } else {
+        # check against md5 argument
+        if (md5.file!=md5) {
+            stop("md5 does not match md5 of file")
+        }
+    }
+
 
 	#################################################################
 	# create blobobject, it's a list with all the info, except the
 	# data. Do not overwrite existing objects, they can run out of
 	# sync. 
-
-	md5 <- getmd5(fpath)
 
 	blobobj <- list(fname=basename(fpath),path=blobpath,kv=kv,
 					description=description,md5=md5,

@@ -49,8 +49,8 @@ test.createBlobExceptions <- function() {
 							  textfile=testtxt))
 
 	checkException(createBlob(fname=testdat,name=blobname,
-                              kv=kvlist,
-                              description=as.character(as.null())))
+                              kv=kvlist,description="test blob",
+                              md5=1))
 
 
 	PgObjectsClose()
@@ -178,4 +178,39 @@ test.createBlob.file <- function(){
 	deleteBlob(blobname)
 	PgObjectsClose()
 
+}
+
+test.createblob.md5 <- function() {
+    # this function tests md5 check of creatblob. If md5 argument of
+    # createblob does not match md5 of file, createblob should give
+    # error.
+
+
+	source("../inst/unitTests/sysSetup.R")
+
+	PgObjectsInit(dbname=getOption("pgobj.dbname"),
+				  passwd=getOption("pgobj.password"))
+
+    # alter md5, creat bogus md5
+    md5.new <- testdat.md5
+    md5.new <- gsub("e","0",md5.new)
+    if(md5.new == testdat.md5) {
+        # our bogus md5 is the same as the original md5, shit should
+        # not happen
+        stop("me5.new == testdat.md5")
+    }
+
+    # make sure no stale blob exists, if blob exists this will result
+    # in the wrong exception
+	try(deleteBlob(blobname),silent=TRUE)
+    # test exemptions
+
+	checkException(createBlob(fname=testdat,name=blobname,
+						  textfile=testtxt,
+						  kv=kvlist,md5=md5.new,
+						  description="a test blob"))
+
+	checkTrue(!objectExists(blobname))
+	deleteBlob(blobname)
+	PgObjectsClose()
 }
