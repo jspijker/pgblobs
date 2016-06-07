@@ -4,7 +4,8 @@
 
 createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 					   description="",textfile=NA, md5=NA,
-					   blobpath=getOption("pgobj.blobs")) {
+					   blobpath=getOption("pgobj.blobs"),
+                       overwrite=TRUE) {
 
 	#################################################################
 	# options:
@@ -14,6 +15,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 	# kv: list with key-value pairs: list(key1="value",key2="value2")
 	# description: string containing short description
 	# text file: text file with longer description (can be NA)
+    # md5: md5 checksum of file, to check before blob is created
 	# blobpath: path to store blob data
 
 	# obj or fname, and name, path should not be empty
@@ -21,6 +23,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 	# blob obj is stored with 'name.blob' in database, standard overwrite rules
 	# obj is stored in path with name.rds, together with ini file:
 	# name.ini
+    # overwrite: should createBlob overwrite existing objects
 
 
 	#################################################################
@@ -85,6 +88,10 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 
 	if(!is.na(md5)&&!is.character(md5)) {
 		stop("md5 is not character")
+	}
+
+	if(!is.logical(overwrite)) {
+		stop("overwrite is not logical")
 	}
 
 	# check names of kv
@@ -163,6 +170,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
     } else {
         # check against md5 argument
         if (md5.file!=md5) {
+            file.remove(fpath)
             stop("md5 does not match md5 of file")
         }
     }
@@ -177,9 +185,16 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 					description=description,md5=md5,
 					text=txtcontent,isObject=isObject)
 
-	#store the blob object to the database, including meta data.
-	storeObj(name,blobobj)
-	 for (i in names(kv)) {
+	#store the blob object to the database, including meta data. use
+    #try so we can catch errrors
+    err <- try(storeObj(name,blobobj,overwrite=overwrite))
+    if(class(err)=="try-error") {
+        # oops
+        file.remove(fpath)
+        stop("storeObj returns an error")
+    }
+
+	for (i in names(kv)) {
 		 storeKeyval(obj=name,key=i,val=kv[[i]],overwrite=TRUE)
 	 }
 	storeKeyval(obj=name,key="md5",val=as.character(md5),overwrite=TRUE)

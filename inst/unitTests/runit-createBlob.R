@@ -52,6 +52,9 @@ test.createBlobExceptions <- function() {
                               kv=kvlist,description="test blob",
                               md5=1))
 
+	checkException(createBlob(fname=testdat,name=blobname,
+                              kv=kvlist,description="test blob",
+                              overwrite=1))
 
 	PgObjectsClose()
 }
@@ -210,7 +213,35 @@ test.createblob.md5 <- function() {
 						  kv=kvlist,md5=md5.new,
 						  description="a test blob"))
 
+	checkTrue(!file.exists(paste(blobpath,"/",testfname,sep="")))
 	checkTrue(!objectExists(blobname))
 	deleteBlob(blobname)
+	PgObjectsClose()
+}
+
+test.createblob.overwrite <- function() {
+    # test exeception for overwriting objects
+
+
+	source("../inst/unitTests/sysSetup.R")
+
+	PgObjectsInit(dbname=getOption("pgobj.dbname"),
+				  passwd=getOption("pgobj.password"))
+
+	try(deleteBlob(blobname),silent=TRUE)
+    
+    x <- 1
+    storeObj(blobname,x)
+    checkException(createBlob(fname=testdat,name=blobname,
+                              textfile=testtxt,overwrite=FALSE,
+                              kv=kvlist, description="a test blob"))
+
+    # 
+    #     createBlob(fname=testdat,name=blobname,
+    #                               textfile=testtxt,overwrite=FALSE,
+    #                               kv=kvlist, description="a test blob")
+    # 
+	checkTrue(!file.exists(paste(blobpath,"/",testfname,sep="")))
+	checkTrue(!isBlob(blobname))
 	PgObjectsClose()
 }
