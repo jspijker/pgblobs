@@ -236,11 +236,6 @@ test.createblob.overwrite <- function() {
                               textfile=testtxt,overwrite=FALSE,
                               kv=kvlist, description="a test blob"))
 
-    # 
-    #     createBlob(fname=testdat,name=blobname,
-    #                               textfile=testtxt,overwrite=FALSE,
-    #                               kv=kvlist, description="a test blob")
-    # 
 	checkTrue(!file.exists(paste(blobpath,"/",testfname,sep="")))
 	checkTrue(!isBlob(blobname))
 	PgObjectsClose()
