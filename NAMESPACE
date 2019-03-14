@@ -9,4 +9,5 @@ export(write.ini)
 export(storeIniObj)
 export(getMetaObjName)
 export(getMetaObj)
+export(importBlob)
 
