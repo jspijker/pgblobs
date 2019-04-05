@@ -11,6 +11,9 @@
 #' @param importfile full path of the file to import
 #' @param overwrite Should existing blobs be overwritten
 #'
+#' Please note that this function overwrites existing files in the
+#' data directory
+#'
 #' @export
 
 
@@ -31,7 +34,7 @@ importBlob <- function(importfile,overwrite=FALSE) {
 
     #copy file
     destfile <- datafile(basename(importfile))
-    file.copy(importfile,destfile)
+    file.copy(importfile,destfile,overwrite=TRUE)
 
     # extract meta data from ini file
     fname <- subset(ini$kv,section=="meta"&key=="src")$value
