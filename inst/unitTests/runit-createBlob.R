@@ -84,6 +84,7 @@ test.createBlob <- function() {
 						  kv=kvlist,
 						  description="a test blobl")
 	checkTrue(objectExists(blobname))
+	checkTrue(isBlob(blobname))
 
 
 	deleteBlob(blobname)
@@ -95,6 +96,7 @@ test.createBlob <- function() {
 						  description="a test blobl")
 
 	checkTrue(objectExists(blobname))
+	checkTrue(isBlob(blobname))
 	v1<-getKeyval(blobname,"key1")
 	checkIdentical(v1,"value1")
 
@@ -112,6 +114,7 @@ test.createBlob <- function() {
 
 
 	checkTrue(objectExists(blobname))
+	checkTrue(isBlob(blobname))
 	v1<-getKeyval(blobname,"key1")
 	checkIdentical(v1,"value1")
 	checkTrue(file.exists(paste(blobpath,testfname,sep="/")))
@@ -149,6 +152,7 @@ test.createBlob.file <- function(){
 						   description="a test blobl")
 
 	checkTrue(objectExists(blobname))
+	checkTrue(isBlob(blobname))
 
 	# try to overwrite blob
 

@@ -187,7 +187,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 
 	#store the blob object to the database, including meta data. use
     #try so we can catch errrors
-    err <- try(storeObj(name,blobobj,overwrite=overwrite))
+    err <- try(storeObj(name,blobobj,overwrite=overwrite,isblob=TRUE))
     if(class(err)=="try-error") {
         # oops
         file.remove(fpath)
