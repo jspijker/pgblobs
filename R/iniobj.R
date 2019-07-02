@@ -4,7 +4,7 @@ storeIniObj <- function(obj.data,obj.meta) {
 	kv <- obj.meta$kv
 	obj.name=subset(kv,key=="name")$value
 	if(is.null(obj.name)){
-		stop("no object name found")
+		stop("storeIniObj: no object name found")
 	}
 	print(obj.name)
 	storeObj(obj.name,obj.data)
@@ -45,7 +45,7 @@ getMetaObjName <- function(obj.name) {
 getMetaObj <- function(obj.name) {
 	meta.obj <- getMetaObjName(obj.name)
 	if(is.na(meta.obj)) {
-		stop("object not found")
+		stop("getMetaObj: object not found")
 	}
 	obj <- getObj(meta.obj)
 
