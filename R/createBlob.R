@@ -221,7 +221,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 
 	#################################################################
 	# return object
-	return(blobobj)
+	invisible(blobobj)
 }
 
 
