@@ -61,9 +61,12 @@ importBlob <- function(importfile,overwrite=FALSE) {
         }
     }
 
+   if(!is.null(kvlist$description)) {
+      description=""
+   } 
 
     x<-createBlob(fname=destfile,name=name,kv=kvlist,
-                  description=description,md5=md5,
+                  description=,md5=md5,
                   textfile=txtfile)
 
 
