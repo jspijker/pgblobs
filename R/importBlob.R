@@ -39,7 +39,7 @@ importBlob <- function(importfile,overwrite=FALSE) {
     # extract meta data from ini file
     fname <- subset(ini$kv,section=="meta"&key=="src")$value
     name <- subset(ini$kv,section=="meta"&key=="name")$value
-    description <- subset(ini$kv,section=="meta"&key=="description")$value
+    desc <- subset(ini$kv,section=="meta"&key=="description")$value
     md5 <- subset(ini$kv,section=="object"&key=="md5")$value
 
     # create txt file with long description of blob
@@ -62,11 +62,11 @@ importBlob <- function(importfile,overwrite=FALSE) {
     }
 
    if(!is.null(kvlist$description)) {
-      description=""
+      desc=""
    } 
 
     x<-createBlob(fname=destfile,name=name,kv=kvlist,
-                  description=,md5=md5,
+                  description=desc,md5=md5,
                   textfile=txtfile)
 
 
