@@ -59,7 +59,7 @@ createBlob <- function(obj=NA,fname=NA,name=NA,kv=NA,
 		stop("name is not character")
 	}
 
-	if(!is.na(kv)&&!is.list(kv)) {
+	if(!any(is.na(kv))&&!is.list(kv)) {
 		stop("kv is not a list")
 	}
 
